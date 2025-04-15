@@ -1,3 +1,46 @@
+# Heron Coding Challenge - Report
+
+## Planning Phase
+
+Before coding, I planned out my idea for what the final version of this project would look like. I analyzed the existing codebase first then addressed the questions from Part 1 and 2 as seen below in the Overview sections. 
+
+My analysis of the initial codebase yielded the following notes: 
+
+![image](https://github.com/user-attachments/assets/95bda93e-333f-4c36-bada-c4f2c7f036f0)
+
+Though simple, I thought it important to understand what I was working with before beginning, as I'd actually not used Flask before this task. 
+
+Following this, I addressed Part 1:
+
+![image](https://github.com/user-attachments/assets/2d799e19-7dee-4825-82ac-e6f9c3cbecd3)
+
+This outlined two main issues with the current system:
+* New document types necessitate new `if doc_type in filename:` statements
+* Classifier depends on consistent naming conventions w/ Document type in filename w/ specific spelling
+
+The way in which these issued could be addressed was largely by modifying the classifier. For this, I had two ideas given the *extension* types. The first was an NLP based classifier, which would necessitate that all files be converted to text format, suited for the PDF files. The second was an Image Rec based classifier, which would necessitate that all files be converted to img format, suited for thg PNG files. The processes by which both would be utilized are detailed in the snippet above.
+
+Overall, I ended up going with the NLP based classifier for a few reasons:
+* Documents may not have similar formats, which could lead to difficulties when doing Image Rec (no concrete patterns to pick up on)
+* Documents of different types may have similar formats, which could lead to misclassification
+* Building our own model would require synthetic data generation in image format, which I thought would be more difficult precision-wise and more expensive than text generation
+* Zero-shot was likely not possible due to the specificity of the data and labels we were trying to classify (how many models have been trained to recognize the difference between bank statements and invoices?)
+* Few-shot has the same issues as building our own model (data generation infidelity)
+
+With these questions explored, I moved on to Part 2:
+
+![image](https://github.com/user-attachments/assets/83999f82-767b-43ad-858a-680a454d068c)
+
+When I first set out to tackle this problem, I'd not yet considered zero-shot classifiers, and thus had plans on how to build a robust classifier of my own using synthetic data. I planned to use an LLM to generate said data. Prediction thresholding was another idea I had, though this was forgone as it wasn't an issue for any of the examples I used in testing. In a true production environment however, this might be a decent idea. Lastly, for ease of deployment, saving the model parameters and packaging them with the project file was an idea I had to avoid the need to retrain models client-side. 
+
+This was the general architecture at the end of the planning phase: 
+
+![image](https://github.com/user-attachments/assets/2a177aa0-a3de-4d6a-b3d0-ee52239326b9)
+
+## Work Phase
+
+
+
 # Heron Coding Challenge - File Classifier
 
 ## Overview
