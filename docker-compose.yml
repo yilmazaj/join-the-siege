@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: HeronChallengeApp
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app  # Mount current dir for live code editing (optional)
+    environment:
+      - FLASK_ENV=development
+    command: python -m src.app

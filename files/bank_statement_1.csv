@@ -1,0 +1,24 @@
+Chase Bank,,,
+,,,
+Account Holder: ,John,,
+Account Number: ,xxxx-xxxx-xxxx-2193,,
+,,,
+Date,Description,Debit ($),Credit ($)
+1/1/2023,Direct Deposit,326.73,0
+20/01/2023,Direct Deposit,424.61,0
+4/1/2023,ACH Payment,0,215.7
+3/1/2023,Check Deposit,464.84,0
+20/01/2023,Debit Card Purchase,0,695.38
+4/1/2023,POS Purchase,0,136.1
+27/01/2023,Online Transfer,285.34,0
+5/1/2023,ACH Payment,0,436.96
+16/01/2023,POS Purchase,0,203.32
+15/01/2023,POS Purchase,0,613.07
+28/01/2023,POS Purchase,0,189.97
+7/1/2023,Debit Card Purchase,0,65.51
+8/1/2023,Check Deposit,592.13,0
+20/01/2023,Debit Card Purchase,0,289.5
+28/01/2023,POS Purchase,0,10.44
+24/01/2023,Loan Repayment,541.03,0
+,,,
+Statement Period: ,2023-02,,

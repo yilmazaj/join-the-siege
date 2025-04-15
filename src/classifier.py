@@ -1,17 +1,15 @@
 from werkzeug.datastructures import FileStorage
+from transformers import pipeline
 
-def classify_file(file: FileStorage):
-    filename = file.filename.lower()
-    # file_bytes = file.read()
+from src.preprocessor import do_preprocessing
 
-    if "drivers_license" in filename:
-        return "drivers_licence"
 
-    if "bank_statement" in filename:
-        return "bank_statement"
 
-    if "invoice" in filename:
-        return "invoice"
+def classify_file(file: FileStorage, possible_labels):
+    preprocessed_data = do_preprocessing(file)
 
-    return "unknown file"
+    classifier = pipeline('zero-shot-classification', model='facebook/bart-large-mnli')
+    result = classifier(preprocessed_data, possible_labels)
+
+    return f"Predicted filetype: {result['labels'][0]}, prediction score: {round(result['scores'][0], 4)}"
 
