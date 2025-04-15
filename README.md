@@ -39,6 +39,55 @@ This was the general architecture at the end of the planning phase:
 
 ## Work Phase
 
+With the planning done, I finally started on the coding portion. My programming was done in parts, as outlined below. Black text indicates a step, grey text indicates a search query, green text indicates an implemented plan for the step, yellow text indicates an approach that was considered or implemented but later abandoned, red text indicates an approach that could've been taken but was discarded before implementation, and blue text indicates personal reminders / notes. 
+
+![image](https://github.com/user-attachments/assets/12716e9a-e4b2-4c5b-bb35-b5ce4071c560)
+
+The first task was getting a package for reading images. I chose cv2, due to its compatability with a wide variety of image formats including PNG, JPG, TIF, and many more. Images were grayscaled on read-in and then thresholded with an Adaptive Gaussian filter (good for images w/ different light levels) before being fed into an Optical Character Recognition (OCR) algorithm, allowing for text extraction from the images. 
+
+OCR was first attempted with the EasyOCR package, which yielded lackluster results. This approach was considered first due to it being lightweight and requiring no local system installs. Tesseract was the second approach to this and performed quite well. Interestingly, it extracted text more accurately without the adaptive thresholding. 
+
+Once text could be extracted from images, I worked on getting text from PDF's, employing the use of the PyMuPDF library. It was simple and easy to use.
+
+The choice of NLP classifier wasn't as difficult as I thought it would be. I ended up going with a BERT model, as I'd seen its performance before and knew it had a zero-shot model that could be implemented and run locally without local system installs. I was able to provide three labels (bank statement, drivers license, and invoice) and pass in a file, recieving an output with probabilities for each label. To my surprise, this approach worked quite well and was relatively fast. If this failed, I was prepared to use a few-shot learning approach by attaching a Linear layer to a pretrained BERT model and running some of the given examples through it (keeping a few unseen for testing purposes). 
+
+Once this was done, I implemented text extraction from Microsoft Word documents, as well as Microsoft Excel and CSV files. This went rather smoothly; I used docx2txt for DOCX, and the ever reliable pandas package for XLSX and CSV. 
+
+Despite tests with curl running smoothly, I wanted the `pytest` command to properly test the new classifier system, and thus wrote a test function that ran through each file in the files/ folder and verified that the classifier output the correct document type. 
+
+Though it didn't make it into the final submission, I did also investigate data generation as a side goal. Even though the zero-shot classification worked for the given documents (as well as the test documents produced for the new filetypes), I thought it would be worthwhile to attempt data generation for future plans of developing a dedicated, fine-tuned model of our own. This is what I found:
+* GPT-2 tended to select 2-3 lines of text from a given input and repeat it 10-30 times as an output.
+* Phi-2 tended to output almost identical versions of the input and also randomly injected bits of the prompt into the output.
+* HuggingFace models such as llama3 and Mistral required permission to access (on the HuggingFace website), then an authkey (to access via API). I was able to pass these barriers, but ultimately couldn't use either model due to a stated connection error. Many fixes were tried, and none worked.
+
+Unfortunately, I ended up running out of time before rediscovering Ollama, which allowed for models to be downloaded off their website and run locally through a local system install of Ollama. I believe that this would've been a viable solution for data generation, with the added bonus of being extremely easy to work with. Some time might've been needed for proper prompt construction and experimentation with creativity / randomness variables such as temperature and top_k. 
+
+## How to Run
+
+Due to the local system install for Tesseract, I needed a way to package this dependency with my code to prevent clients from needing this install (and any future ones) locally. As such, I chose to use Docker. Though I'd never worked with it before directly, I was familiar with its capability. 
+
+Once this repo is downloaded on a local machine, the app can be run either through Terminal (or adjacent applications) or through Docker Desktop (the below instructions are for Windows version).
+
+### Building
+
+Building can be done by navigating to the directory containing the Dockerfile and running the command: `docker compose up --build`. The build should take about 3-5 minutes, and will automatically start the app when it's done. 
+
+### Testing & Curling (Terminal)
+
+Testing and curling is simple once the container is running. To do either, open a new terminal, navigate to the directory containing the Dockerfile and run the command: `docker compose exec app bash`. This will open a bash prompt where you can test the application by typing `pytest`, or send request using the following command format: `curl -X POST -F 'file=@files/drivers_license_1.jpg' http://127.0.0.1:5000/classify_file`. 
+
+### Testing & Curling (Docker Desktop)
+
+Once the container is running, click on the container in your 'Containers' page, then click on the 'Exec' tab and type the same commands as in the previous section. 
+
+## Improvements / Further Work
+
+* Implement the Ollama LLM model for data generation, do prompt engineering, and experiment with parameters to facilitate generation of a wider variety of data. This would allow for training of our own models, as well as allow for new document types to be introduced and trained for regardless of dataset sizes. Would further allow for more rigorous testing of the current zero-shot classifier implementation. 
+* Test the effectiveness of the zero-shot model against a fully trained model (using generated data).
+* Reduce bulk of preprocessor.py. Much of the code in preprocessor.py simply performs text extraction given a certain file extension. This code could be condensed by creating a dictionary that maps each file extension to a callable text extraction method and then calls a one liner that does the extraction. This would make adding new text extraction methods for new file types easier (write method, add to dictionary) and would reduce the clutter of the current if -> elif -> else implementation.
+* Create a frontend for the app. Currently the app defaults to a 404 (as there is no homepage). It would be convenient if you could drag and drop or upload files to a website (even if its localhost) and get the results displayed neatly.
+* Set up CI/CD pipeline via GitHub, or through other methods to facilitate easier building, testing, and deployment.
+
 
 
 # Heron Coding Challenge - File Classifier
